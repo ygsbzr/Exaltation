@@ -136,7 +136,7 @@ Uncaps nail swing speed.
 
 Increases spell damage depending on remaining SOUL after cast. Every 3 SOUL increases damage by 1%, to a max of +25%.
 
-## Dashmaster -> Stagway Coin
+## Sprintmaster -> Stagway Coin
 
 ![Coin](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/37.png?raw=true)
 
