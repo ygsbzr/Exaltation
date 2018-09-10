@@ -25,3 +25,9 @@ A full list of glorifications can be found [here](https://github.com/Xhuis/Exalt
 To install Exaltation, use the Mod Installer found [here](https://radiance.host/mods/ModInstaller.exe). Search for Exaltation on the mod list.
 
 Exaltation also requires ModCommon to function.
+
+## Other Info
+
+[Full charm glorification list. Contains spoilers.](https://github.com/Xhuis/Exaltation/blob/master/CHARM_LIST.md)
+
+[Changelog. No spoilers.](https://github.com/Xhuis/Exaltation/blob/master/CHANGELOG.md)
