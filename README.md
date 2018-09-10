@@ -18,6 +18,8 @@ Created by Xhuis with a lot of help from modders in the Hollow Knight Discord, i
 * **Pantheon of the Sage** - Soul Catcher, Soul Eater, Dashmaster, Sprintmaster, Sharp Shadow
 * **Pantheon of the Knight** - Shaman Stone, Spell Twister, Quick Slash, Quick Focus, Hiveblood
 
+A full list of glorifications can be found [here](https://github.com/Xhuis/Exaltation/blob/master/CHARM_LIST.md). Note that this file contains **spoilers!**
+
 ## Installation
 
 To install Exaltation, use the Mod Installer found [here](https://radiance.host/mods/ModInstaller.exe). Search for Exaltation on the mod list.
