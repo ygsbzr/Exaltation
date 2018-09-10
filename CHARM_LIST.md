@@ -69,8 +69,6 @@ Deals 2.5x nail damage instead of 2x, and deals spell damage instead of generic 
 
 Costs no notches.
 
-Increases lifeblood masks by six, instead of four.
-
 ## Sharp Shadow -> Razor Shadow
 
 ![SS](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/16.png?raw=true)
