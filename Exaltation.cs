@@ -71,7 +71,7 @@ namespace Exaltation
 					((SpriteFlash)SpriteField.GetValue(HeroController.instance)).flash(Color.blue, 0.5f, 0.0f, 0.0f, 0.5f);
 				}
 			}
-			if (Input.GetKeyDown(KeyCode.H)) // Uncomment this for debug purposes.
+			/*if (Input.GetKeyDown(KeyCode.H)) // Uncomment this for debug purposes.
 			{
 				glorified = !glorified;
 				Settings.SprintmasterGlorified = glorified;
@@ -108,7 +108,7 @@ namespace Exaltation
 			{
 				HeroController.instance.StartCoroutine(GloryEffects("Glorified by the god of Testing"));
 				Log("Glorification effects tested");
-			}
+			}*/
 			if (HeroController.instance.cState.nearBench && (WearingGlorifiedCharm("SoulCatcher") || WearingGlorifiedCharm("SoulEater")))
 				HeroController.instance.AddMPChargeSpa(1);
 		}
