@@ -32,4 +32,4 @@ Exaltation also requires ModCommon to function.
 
 [Changelog. No spoilers.](https://github.com/Xhuis/Exaltation/blob/master/CHANGELOG.md)
 
-Exaltation is licensed under the [MIT License](https://github.com/Xhuis/Exaltation/blob/master/LICENSE.md). If any representatives feel that this license conflicts with Hollow Knight as a product, I urge them to get in touch with me so that I can change it properly.
+Exaltation is licensed under the [MIT License](https://github.com/Xhuis/Exaltation/blob/master/LICENSE.md). If any representatives from Team Cherry feel that this license conflicts with Hollow Knight as a product, I urge them to get in touch with me so that I can change it properly.
