@@ -31,3 +31,5 @@ Exaltation also requires ModCommon to function.
 [Full charm glorification list. Contains spoilers.](https://github.com/Xhuis/Exaltation/blob/master/CHARM_LIST.md)
 
 [Changelog. No spoilers.](https://github.com/Xhuis/Exaltation/blob/master/CHANGELOG.md)
+
+Exaltation is licensed under the [MIT License](https://github.com/Xhuis/Exaltation/blob/master/LICENSE.md). If any representatives feel that this license conflicts with Hollow Knight as a product, I urge them to get in touch with me so that I can change it properly.
