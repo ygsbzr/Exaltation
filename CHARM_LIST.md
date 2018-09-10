@@ -8,7 +8,7 @@ This file contains a list of all charm glorifications, their sprites, and their 
 
 Rather than picking up Geo after a few moments, any Geo will be picked up instantly as soon as it spawns.
 
-## Wayward Compass - Lifeseed Lantern
+## Wayward Compass -> Lifeseed Lantern
 
 ![Wayward Compass](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/2.png?raw=true)
 
