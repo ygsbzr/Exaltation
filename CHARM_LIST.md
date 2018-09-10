@@ -57,6 +57,20 @@ Increases lifeblood masks by four, instead of two.
 
 Increases lifeblood masks by six, instead of four.
 
+## Thorns of Agony -> Palace Rose
+
+![Thorns](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/12.png?raw=true)
+
+Deals 2.5x nail damage instead of 2x, and deals spell damage instead of generic damage.
+
+## Steady Body -> White Sprig
+
+![Sprig](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/14.png?raw=true)
+
+Costs no notches.
+
+Increases lifeblood masks by six, instead of four.
+
 ## Sharp Shadow -> Razor Shadow
 
 ![SS](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/16.png?raw=true)
@@ -82,6 +96,16 @@ Captures 5% additional SOUL on nail hit, instead of 3%.
 ![Eater](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/21.png?raw=true)
 
 Captures 11% additional SOUL on nail hit, instead of 8%.
+
+## Nailmaster's Glory -> Sagesoul/Nailsage's Tenacity
+
+![NMGP](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/26_patience.png?raw=true) ![NMG](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/26.png?raw=true)
+
+Obtain Sagesoul by glorifying before obtaining the Void Heart, and Nailsage's Tenacity by glorifying after.
+
+Sagesoul causes nail hits to gain no SOUL and deal spell damage instead of nail damage, and the bearer gains 4 SOUL every 0.75 seconds.
+
+Nailsage's Tenacity increases nail damage by 3% per mask of missing health.
 
 ## Joni's Blessing -> Ancestral Blessing
 
