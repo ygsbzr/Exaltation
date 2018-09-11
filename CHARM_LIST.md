@@ -18,13 +18,13 @@ Costs zero notches, and adds one lifeblood mask.
 
 ![Grubsong](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/3.png?raw=true)
 
-Increases the amount of SOUL gained on nail hit by 1 per missing mask of health.
+Increases the amount of SOUL gained on nail hit by 1 per two missing masks of health.
 
 ## Stalwart Shell -> Kingsmould Carapace
 
 ![Shell](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/4.png?raw=true)
 
-When taking damage above one masks, SOUL equal to your focus cost is automatically consumed to prevent one mask of that damage.
+When taking damage above one masks, one-third of your maximum SOUL may be automatically consumed to prevent one mask of that damage.
 
 ## Baldur Shell -> Baldur Stoneshell
 
@@ -43,7 +43,7 @@ Nullifies a single hit that would kill you, and increases nail damage while at o
 
 ![Focus](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/7.png?raw=true)
 
-Reduces focus cost to 1/4 of the SOUL meter instead of 1/3.
+Greatly increases the speed of focusing SOUL.
 
 ## Lifeblood Heart -> Lifeblood Crux
 

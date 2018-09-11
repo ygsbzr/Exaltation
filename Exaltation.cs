@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿//#define DEBUGMODE
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -11,6 +12,11 @@ using ModCommon.Util;
 
 namespace Exaltation
 {
+#if DEBUGMODE
+#warning ####################################
+#warning DEBUG MODE ACTIVE - DO NOT SHIP THIS
+#warning ####################################
+#endif
 	public class Exaltation : Mod<SaveSettings>
 	{
 
@@ -21,13 +27,16 @@ namespace Exaltation
 		private const float BASE_SPEED_CH_GLORY_COMBO = 12.1f; //glorified sprintmaster + dashmaster = 45% increase
 		private const float BASE_SPEED_CH_GLORYMACHINEWOKE = 12.45f; //glorified sprintmaster + glorified dashmaster = 50% increase
 
+		private const float BASE_FOCUS_SPEED_CH = 0.018f;
+		private const float SWIFT_FOCUS_SPEED_CH = 0.01f;
+
 		private const float BASE_ATTACK_DURATION_CH = 0.25f;
 		private const float BASE_ATTACK_RECOVERY_CH = 0.25f;
 		private const float STEEL_TEMPEST_ATTACK_DURATION = 0.1f;
 		private const float STEEL_TEMPEST_ATTACK_COOLDOWN = 0.05f;
 
 		private const float BASE_HIVEBLOOD_SPEED = 5f; //10 seconds
-		private const float AMPOULE_HIVEBLOOD_SPEED = 2.5f; //5 seconds
+		private const float AMPOULE_HIVEBLOOD_SPEED = 4f; //8 seconds
 
 		private float StoneshellRegenTime = 0f;
 		private const float STONESHELL_REGEN_WAIT = 10f;
@@ -75,7 +84,7 @@ namespace Exaltation
 			}
 			/*if (Input.GetKeyDown(KeyCode.H)) // Uncomment this for debug purposes.
 			{
-				const bool glorified = Settings.SprintmasterGlorified;
+				bool glorified = Settings.SprintmasterGlorified;
 				Settings.SprintmasterGlorified = glorified;
 				Settings.DashmasterGlorified = glorified;
 				Settings.StalwartShellGlorified = glorified;
@@ -95,10 +104,6 @@ namespace Exaltation
 				Settings.JonisBlessingGlorified = glorified;
 				Settings.SpellTwisterGlorified = glorified;
 				Settings.WaywardCompassGlorified = glorified;
-				Settings.PantheonOneGlory = glorified;
-				Settings.PantheonTwoGlory = glorified;
-				Settings.PantheonThreeGlory = glorified;
-				Settings.PantheonFourGlory = glorified;
 				Log("Charm glorification set to " + glorified);
 			}
 			if (Input.GetKeyDown(KeyCode.J))
@@ -185,7 +190,7 @@ namespace Exaltation
 					return "Swift Focus";
 				else if (key == "CHARM_DESC_7")
 					return "A charm containing crystallized SOUL.\n\n" +
-						"Increases the speed and decreases the cost of focusing SOUL.";
+						"Greatly increases the speed of focusing SOUL.";
 			}
 			if (IsGlorified("LifebloodHeart"))
 			{
@@ -312,10 +317,6 @@ namespace Exaltation
 					return "A tarnished symbol once held by the upper caste of Hallownest. Each coin allowed priority access to the Stagways, should its holder prefer the old paths.\n\n" +
 						"Greatly increases the running speed of its bearer, allowing them to expedite their travels.";
 			}
-			if (key == "CHARM_DESC_36_B")
-				return "Holy charm symbolising a union between higher beings. The bearer will slowly absorb the limitless SOUL contained within.\n\n" +
-					"Opens the way to a birthplace.\n\n" +
-					"First, however, be certain one has no more use for the power inside.";
 			return Language.Language.GetInternal(key, sheet);
 		}
 
@@ -337,6 +338,7 @@ namespace Exaltation
 				PlayerData.instance.charmCost_29 = 3;
 			if (IsGlorified("Dashmaster"))
 				PlayerData.instance.charmCost_31 = 1;
+			Settings.LastVersion = GetVersion();
 		}
 
 		private void AfterSaveGameLoad(SaveGameData data)
@@ -411,6 +413,7 @@ namespace Exaltation
 				}
 			}
 			UpdateMoveSpeed();
+			AdjustOldValues();
 			WyrmfuryDeathProtection = true; //reset death protection when resting
 			if(WearingGlorifiedCharm("QuickSlash"))
 			{
@@ -422,7 +425,6 @@ namespace Exaltation
 				hc.ATTACK_COOLDOWN_TIME_CH = BASE_ATTACK_RECOVERY_CH;
 				hc.ATTACK_DURATION_CH = BASE_ATTACK_DURATION_CH;
 			}
-			pd.focusMP_amount = WearingGlorifiedCharm("QuickFocus") ? 24 : 33;
 			GameObject helf = GameObject.Find("Health");
 			if (helf != null)
 			{
@@ -430,6 +432,7 @@ namespace Exaltation
 					Fsm.GetFsmFloat("Recover Time").
 					Value = WearingGlorifiedCharm("Hiveblood") ? AMPOULE_HIVEBLOOD_SPEED : BASE_HIVEBLOOD_SPEED;
 			}
+			hc.spellControl.Fsm.GetFsmFloat("Time Per MP Drain CH").Value = WearingGlorifiedCharm("QuickFocus") ? SWIFT_FOCUS_SPEED_CH : BASE_FOCUS_SPEED_CH;
 			pd.charmCost_2 = IsGlorified("WaywardCompass") ? 0 : 1;
 			pd.charmCost_14 = IsGlorified("SteadyBody") ? 0 : 1;
 			pd.charmCost_29 = IsGlorified("Hiveblood") ? 3 : 4;
@@ -441,10 +444,10 @@ namespace Exaltation
 			PlayerData pd = PlayerData.instance;
 			if(pd.maxHealth <= amount) //only protect from damage if we aren't at max health; mainly for radiant bosses
 				return amount;
-			if(amount >= 2 && pd.MPCharge >= pd.focusMP_amount && WearingGlorifiedCharm("StalwartShell"))
+			if(amount >= 2 && pd.MPCharge >= 33 && WearingGlorifiedCharm("StalwartShell"))
 			{
 				amount--; // reduces high damage by 1 mask!
-				HeroController.instance.TakeMP(pd.focusMP_amount);
+				HeroController.instance.TakeMP(33);
 				HeroController.instance.GetAttr<AudioSource>("audioSource")
 					.PlayOneShot(LoadAssets.ShellSound, 1f);
 			}
@@ -496,7 +499,7 @@ namespace Exaltation
 			if (WearingGlorifiedCharm("Grubsong"))
 			{
 				int MissingHealth = PlayerData.instance.maxHealth - PlayerData.instance.health;
-				amount += 1 * MissingHealth;
+				amount += (int)(0.5 * MissingHealth);
 			}
 			if (WearingGlorifiedCharm("SoulCatcher"))
 				amount += 2; //Vanilla soul catcher is +3, so +2 = +5%
@@ -893,6 +896,16 @@ namespace Exaltation
 			}
 
 			On.GeoControl.OnEnable += ProcessGeoUpdate;
+		}
+
+		private void AdjustOldValues()
+		{
+			string version = GetVersion();
+			if (version != Settings.LastVersion) //assume this to be an old version and adjust values accordingly
+			{
+				if (PlayerData.instance.focusMP_amount == 24) //1.0.2.1: Swift Focus focus cost decrease removed
+					PlayerData.instance.focusMP_amount = 33;
+			}
 		}
 	}
 }

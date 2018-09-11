@@ -29,5 +29,7 @@ namespace Exaltation
 
 		public bool FotFShade { get => GetBool(); set => SetBool(value); }
 		public bool NMGPatience { get => GetBool(); set => SetBool(value); }
+
+		public string LastVersion { get => GetString(); set => SetString(value); }
 	}
 }
