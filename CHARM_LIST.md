@@ -63,7 +63,7 @@ Increases lifeblood masks by six, instead of four.
 
 Deals 2.5x nail damage instead of 2x, and deals spell damage instead of generic damage.
 
-## Steady Body -> White Sprig
+## Steady Body -> Garden Sprig
 
 ![Sprig](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/14.png?raw=true)
 
@@ -76,11 +76,10 @@ Costs no notches.
 Dash damage is increased to 2x nail damage.
 Gain 0.8 seconds of extended invulnerability after the shade dash finishes.
 
-## Shaman Stone -> Esoteric Egg
+## Shaman Stone -> Shaman Relic
 
 ![Egg](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/19.png?raw=true)
 
-~~Lemm eats ten of these.~~
 Increases spell damage by an additional 12.5%.
 
 ## Soul Catcher -> Soul Snare
@@ -105,7 +104,7 @@ Sagesoul causes nail hits to gain no SOUL and deal spell damage instead of nail 
 
 Nailsage's Tenacity increases nail damage by 3% per mask of missing health.
 
-## Joni's Blessing -> Ancestral Blessing
+## Joni's Blessing -> Joni's Benediction
 
 ![Joni](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/27.png?raw=true)
 
@@ -117,7 +116,7 @@ Provides four additional lifeblood masks.
 
 Costs three notches instead of four, and regenerates health twice as fast.
 
-## Dashmaster -> Racemaster
+## Dashmaster -> Marathon Master
 
 ![DM](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/31.png?raw=true)
 

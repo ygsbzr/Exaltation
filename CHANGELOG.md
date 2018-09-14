@@ -2,6 +2,16 @@
 
 Entries here are sorted in descending order depending on age; oldest entries will be the farthest down.
 
+## v1.0.2.2
+
+* White Sprig is now Garden Sprig, and has a new sprite.
+* Esoteric Egg is now Shaman Relic, and has a new sprite.
+* Ancestral Blessing is now Joni's Benediction.
+* Racemaster is now Marathon Master.
+* Kingsmould Carapace's required SOUL to absorb damage is now doubled each time it absorbs damage, and decays at a rate of 3 per second.
+* Razor Shadow now provides 0.6 seconds of extended invulnerability instead of 0.8 seconds.
+* Fixed Razor Shadow granting extended invulnerability in all dashes instead of shade.
+
 ## v1.0.2.1
 
 * Swift Focus no longer decreases focus cost, and instead greatly increases focus speed.

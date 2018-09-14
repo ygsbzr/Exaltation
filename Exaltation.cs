@@ -48,6 +48,11 @@ namespace Exaltation
 		private const float NAILSAGE_SOUL_WAIT = 0.75f;
 		private const int NAILSAGE_SOUL_REGEN = 4;
 
+		private const int KINGSMOULD_CARAPACE_BASE_SOUL = 33;
+		private const float KINGSMOULD_REGEN_WAIT = 0.33f;
+		private int KingsmouldCarapaceSoulCost = KINGSMOULD_CARAPACE_BASE_SOUL;
+		private float KingsmouldCarapaceTimer = 0f;
+
 		private bool WyrmfuryDeathProtection = true;
 		private GameObject CanvasObject;
 		private GameObject TextCanvas; //use a different canvas for text since it's handled differently
@@ -61,6 +66,7 @@ namespace Exaltation
 		private static FieldInfo GeoControlSize = typeof(GeoControl).GetField("size", BindingFlags.NonPublic | BindingFlags.Instance);
 		private static MethodInfo ClinkClink = typeof(GeoControl).GetMethod("PlayCollectSound", BindingFlags.NonPublic | BindingFlags.Instance);
 		private static readonly FieldInfo SpriteField = typeof(HeroController).GetField("spriteFlash", BindingFlags.Instance | BindingFlags.NonPublic);
+		private static FieldInfo ShadowDashCD = typeof(HeroController).GetField("shadowDashTimer", BindingFlags.NonPublic | BindingFlags.Instance);
 
 		private int[] CharmNums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 16, 19, 20, 21, 26, 27, 29, 31, 32, 33, 35, 37 }; //the charm numbers that can be glorified go here for sprites and the like
 
@@ -68,11 +74,12 @@ namespace Exaltation
 		{
 			MakeCanvas();
 			GameManager.instance.StartCoroutine(ChangeSprites());
+			float timer = Time.deltaTime;
 			if (WearingGlorifiedCharm("FuryOfTheFallen"))
 				UpdateWyrmfuryIcon();
 			if (WearingGlorifiedCharm("BaldurShell") && PlayerData.instance.blockerHits < 4)
 			{
-				StoneshellRegenTime -= Time.deltaTime;
+				StoneshellRegenTime -= timer;
 				if (StoneshellRegenTime <= 0)
 				{
 					StoneshellRegenTime = STONESHELL_REGEN_WAIT;
@@ -80,6 +87,15 @@ namespace Exaltation
 					HeroController.instance.GetAttr<AudioSource>("audioSource")
 						.PlayOneShot(LoadAssets.BlockerSound, 1f);
 					((SpriteFlash)SpriteField.GetValue(HeroController.instance)).flash(Color.blue, 0.5f, 0.0f, 0.0f, 0.5f);
+				}
+			}
+			if (WearingGlorifiedCharm("StalwartShell") && KingsmouldCarapaceSoulCost > KINGSMOULD_CARAPACE_BASE_SOUL)
+			{
+				KingsmouldCarapaceTimer -= timer;
+				if (KingsmouldCarapaceTimer <= 0)
+				{
+					KingsmouldCarapaceSoulCost--;
+					KingsmouldCarapaceTimer = KINGSMOULD_REGEN_WAIT;
 				}
 			}
 			/*if (Input.GetKeyDown(KeyCode.H)) // Uncomment this for debug purposes.
@@ -163,7 +179,7 @@ namespace Exaltation
 					return "Kingsmould Carapace";
 				else if(key == "CHARM_DESC_4")
 					return "White metal vessel used to shape and harness void material.\n\n" +
-						"The bearer will remain invulnerable for longer when recovering from damage. Additionally, their SOUL will be used to lower the damage of overwhelming strikes against them.";
+						"The bearer will remain invulnerable for longer when recovering from damage. Additionally, their SOUL will be used, in increasing amounts, to lower the damage of overwhelming strikes against them.";
 			}
 			if (IsGlorified("BaldurShell"))
 			{
@@ -213,15 +229,15 @@ namespace Exaltation
 				if (key == "CHARM_NAME_12")
 					return "Palace Rose";
 				else if (key == "CHARM_DESC_12")
-					return "Hardy, colorless rose taken from the White Palace. Bristles with menacing thorns.\n\n" +
+					return "Hardy, colorless rose grown in the White Palace. Bristles with menacing thorns.\n\n" +
 						"When taking damage, sprout mystical vines that greatly damage nearby foes.";
 			}
 			if (IsGlorified("SteadyBody"))
 			{
 				if (key == "CHARM_NAME_14")
-					return "White Sprig";
+					return "Garden Sprig";
 				else if (key == "CHARM_DESC_14")
-					return "A branch of bark, taken from a pale root in the Queen's Gardens.\n\n" +
+					return "Strip of plant material taken from the Queen's Gardens.\n\n" +
 						"Keeps its bearer from recoiling backwards when they strike an enemy with a nail.\n\n" +
 						"Requires no charm notches.";
 			}
@@ -230,15 +246,15 @@ namespace Exaltation
 				if (key == "CHARM_NAME_16")
 					return "Razor Shadow";
 				else if (key == "CHARM_DESC_16")
-					return "Contains a whispering, eldritch spell that sharpens shadows into weapons.\n\n" +
-						"When using Shadow Dash, the bearer's body will cut through enemies like silk, and remains incorporeal for a short time afterwards.";
+					return "Contains a whispering, eldritch spell that sharpens shadows into vicious weapons.\n\n" +
+						"When using Shadow Dash, the bearer's body will cut through enemies like silk, and remain incorporeal for a short time afterwards.";
 			}
 			if (IsGlorified("ShamanStone"))
 			{
 				if(key == "CHARM_NAME_19")
-					return "Esoteric Egg";
+					return "Shaman Relic";
 				else if(key == "CHARM_DESC_19")
-					return "Mysterious stone egg from before the birth of Hallownest. Its shell has been peeled away, revealing the power contained within.\n\n" +
+					return "Carved relic from within the Ancestral Mound. Said to contain the minds of past generations of shamans.\n\n" +
 						"Greatly increases the power of spells, dealing much more damage to foes.";
 			}
 			if (IsGlorified("SoulCatcher"))
@@ -272,9 +288,9 @@ namespace Exaltation
 			if (IsGlorified("JonisBlessing"))
 			{
 				if (key == "CHARM_NAME_27")
-					return "Ancestral Blessing";
+					return "Joni's Benediction";
 				else if (key == "CHARM_DESC_27")
-					return "Object of worship by the shamans. Transmogrifies vital fluids into blue lifeblood.\n\n" +
+					return "Revered by Joni, the kindly heretic. Transmogrifies vital fluids into blue lifeblood.\n\n" +
 						"The bearer will have a healthier shell and can take much more damage, but they will not be able to heal themselves by focusing SOUL.";
 			}
 			if (IsGlorified("Hiveblood"))
@@ -288,7 +304,7 @@ namespace Exaltation
 			if (IsGlorified("Dashmaster"))	
 			{
 				if(key == "CHARM_NAME_31")
-					return "Racemaster";
+					return "Marathon Master";
 				else if(key == "CHARM_DESC_31")
 					return "Bears the likeness of an eccentric bug known only as ‘The Dashmaster', in true form.\n\n" +
 						"The bearer will be able to dash more often as well as dash downwards.";
@@ -298,7 +314,7 @@ namespace Exaltation
 				if (key == "CHARM_NAME_32")
 					return "Steel Tempest";
 				else if (key == "CHARM_DESC_32")
-					return "A bladed disc forged from the metal of imperfect nails. Emits a whistling sound when thrust through the air.\n\n" +
+					return "Bladed disc forged from pale ore. Emits a whistling sound when moving through the air.\n\n" +
 						"The bearer's nail will become like a storm of metal, moderately decreasing its damage but tremendously increasing its swinging speed.";
 			}
 			if (IsGlorified("SpellTwister"))
@@ -345,6 +361,7 @@ namespace Exaltation
 		{
 			GameManager.instance.StartCoroutine(ChangeSprites());
 		}
+
 		private void ProcessGeoUpdate(On.GeoControl.orig_OnEnable orig, GeoControl self)
 		{
 			orig(self);
@@ -444,20 +461,23 @@ namespace Exaltation
 			PlayerData pd = PlayerData.instance;
 			if(pd.maxHealth <= amount) //only protect from damage if we aren't at max health; mainly for radiant bosses
 				return amount;
-			if(amount >= 2 && pd.MPCharge >= 33 && WearingGlorifiedCharm("StalwartShell"))
+			if(amount >= 2 && pd.MPCharge >= KingsmouldCarapaceSoulCost && WearingGlorifiedCharm("StalwartShell"))
 			{
 				amount--; // reduces high damage by 1 mask!
-				HeroController.instance.TakeMP(33);
+				HeroController.instance.TakeMP(KingsmouldCarapaceSoulCost);
 				HeroController.instance.GetAttr<AudioSource>("audioSource")
 					.PlayOneShot(LoadAssets.ShellSound, 1f);
+				KingsmouldCarapaceSoulCost *= 2;
+				if (KingsmouldCarapaceSoulCost > 100)
+					KingsmouldCarapaceSoulCost = 100;
 			}
-			if(pd.health <= amount && WyrmfuryDeathProtection && WearingGlorifiedCharm("FuryOfTheFallen"))
+			if(pd.health <= amount && amount > 0 && WyrmfuryDeathProtection && WearingGlorifiedCharm("FuryOfTheFallen"))
 			{
 				amount = pd.health - 1; //brings to 1 HP if you're not there already
 				WyrmfuryDeathProtection = false; //nullify the hit!
 				HeroController.instance.GetAttr<AudioSource>("audioSource")
 					.PlayOneShot(LoadAssets.WyrmfurySound, 1f);
-				GameCameras.instance.cameraShakeFSM.SendEvent("AverageShake");
+				GameCameras.instance.cameraShakeFSM.SendEvent("BigShake");
 			}
 			StoneshellRegenTime = STONESHELL_REGEN_WAIT; //prevent the hit from regenerating
 			return amount;
@@ -512,11 +532,14 @@ namespace Exaltation
 
 		private HitInstance HitInstanceAdjust(Fsm owner, HitInstance hit)
 		{
-			string ParentName = hit.Source.transform.parent.name; //note - for many attacks this will be null; be careful
-			if (ParentName != null && ParentName == "Thorn Hit" && IsGlorified("ThornsOfAgony"))
+			if (hit.Source.transform != null)
 			{
-				hit.DamageDealt = (int)(hit.DamageDealt * 1.5);
-				hit.AttackType = AttackTypes.Spell; //palace rose thorns are spell-type instead of normal-type
+				string ParentName = hit.Source.transform.parent.name; //note - for many attacks this will be null; be careful
+				if (ParentName != null && ParentName == "Thorn Hit" && IsGlorified("ThornsOfAgony"))
+				{
+					hit.DamageDealt = (int)(hit.DamageDealt * 1.5);
+					hit.AttackType = AttackTypes.Spell; //palace rose thorns are spell-type instead of normal-type
+				}
 			}
 			if (hit.AttackType == AttackTypes.Spell)
 			{
@@ -545,9 +568,7 @@ namespace Exaltation
 						hit.DamageDealt += (int)(hit.DamageDealt * 0.03f * (PlayerData.instance.maxHealth - PlayerData.instance.health));
 			}
 			if (hit.AttackType == AttackTypes.SharpShadow && WearingGlorifiedCharm("SharpShadow"))
-			{
 				hit.DamageDealt *= 2;
-			}
 			return hit;
 		}
 
@@ -559,10 +580,11 @@ namespace Exaltation
 					yield return null;
 				PlayerData.instance.isInvincible = true;
 				((SpriteFlash)SpriteField.GetValue(HeroController.instance)).flash(Color.black, 1.11f, 0.1f, 0.8f, 0.2f);
-				yield return new WaitForSeconds(0.8f);
+				yield return new WaitForSeconds(0.6f);
 				PlayerData.instance.isInvincible = false;
 			}
-			if(WearingGlorifiedCharm("SharpShadow"))
+			float cooldown = (float)ShadowDashCD.GetValue(HeroController.instance);
+			if (WearingGlorifiedCharm("SharpShadow") && cooldown <= 0)
 				HeroController.instance.StartCoroutine(RazorShadow());
 			return false;
 		}
