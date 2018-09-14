@@ -24,7 +24,9 @@ Increases the amount of SOUL gained on nail hit by 1 per two missing masks of he
 
 ![Shell](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/4.png?raw=true)
 
-When taking damage above one masks, one-third of your maximum SOUL may be automatically consumed to prevent one mask of that damage.
+When taking damage above one masks, SOUL may be automatically consumed to prevent one mask of that damage.
+
+The amount of soul starts at one-third of your maximum SOUL meter, and doubles with each hit. This doubled amount caps at a full SOUL meter, and decreases by 3% SOUL every second.
 
 ## Baldur Shell -> Baldur Stoneshell
 
