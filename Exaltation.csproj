@@ -174,5 +174,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Charms\26_patience.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Charms\AbyssalTuner.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -144,6 +144,8 @@ namespace Exaltation
 					HeroController.instance.AddMPCharge(GainSoul(NAILSAGE_SOUL_REGEN));
 				}
 			}
+			if (EquippedVoidLevel(2))
+				((SpriteFlash)SpriteField.GetValue(HeroController.instance)).flash(Color.black, 1f, 0f, 0.8f, 0.2f);
 		}
 
 		public string LanguageGet(string key, string sheet)
@@ -158,12 +160,33 @@ namespace Exaltation
 			}
 			if (IsGlorified("WaywardCompass"))
 			{
-				if (key == "CHARM_NAME_2")
-					return "Lifeseed Lantern";
-				else if (key == "CHARM_DESC_2")
-					return "Glass lantern containing a Lifeseed. It is said that Lifeseeds' antennae will always face northward.\n\n" +
-						"The bearer will be able to pinpoint their current location on their map, and gain a very modest lifeblood coating.\n\n" +
-						"Requires no charm notches.";
+				if (!PlayerData.instance.gotShadeCharm)
+				{
+					if (key == "CHARM_NAME_2")
+						return "Lifeseed Lantern";
+					else if (key == "CHARM_DESC_2")
+						return "Glass lantern containing a Lifeseed. It is said that Lifeseeds' antennae will always face northward.\n\n" +
+							"The bearer will be able to pinpoint their current location on their map, and gain a very modest lifeblood coating.\n\n" +
+							"Requires no charm notches.";
+				}
+				else if (VoidLevel(1))
+				{
+					if (key == "CHARM_NAME_2")
+						return "Voidtuner";
+					else if (key == "CHARM_DESC_2")
+						return "Tuning device that resonates with the gods of Hallownest. It seeps with black liquid.\n\n" +
+							"Enhances the bearing vessel through unification of the void.\n\n" +
+							"Requires no charm notches.";
+				}
+				else if (VoidLevel(2))
+				{
+					if (key == "CHARM_NAME_2")
+						return "Abyssal Tuner";
+					else if (key == "CHARM_DESC_2")
+						return "Tuning device that resonates with the gods of Hallownest. It drips with black liquid.\n\n" +
+							"Imbues the bearer with freakish strength, speed, and endurance.\n\n" +
+							"Requires no charm notches.";
+				}
 			}
 			if (IsGlorified("Grubsong"))
 			{
@@ -279,10 +302,10 @@ namespace Exaltation
 					return Settings.NMGPatience ? "Sagesoul" : "Nailsage's Tenacity";
 				else if (key == "CHARM_DESC_26")
 					return Settings.NMGPatience ?
-						"Charm ensorcelled with a fraction of the Kingsoul's power.\n\n" +
+						"Charm ensorcelled with a fraction of the Kingsoul's power. Defeat a nailsage in the Hall of Gods to reverse the enchantment.\n\n" +
 						"Improves the bearer's mastery of Nail Arts and slowly draws SOUL from the surrounding world.\n\n" +
 						"The bearer's nail attacks will gain no SOUL, but will slice easily through armor." :
-						"Contains the timeless ferocity and vigor of a Nailsage.\n\n" +
+						"Contains the timeless ferocity and vigor of a Nailsage. Defeat a nailsage in the Hall of Gods to enchant it.\n\n" +
 						"Improves the bearer's mastery of Nail Arts and increases the power of their nail strikes as they near death.";
 			}
 			if (IsGlorified("JonisBlessing"))
@@ -392,7 +415,7 @@ namespace Exaltation
 						Settings.BaldurShellGlorified = true;
 						Settings.SteadyBodyGlorified = true;
 						glorified_this_update = true;
-						hc.StartCoroutine(GloryEffects("Charms glorified by the gods of brotherhood"));
+						hc.StartCoroutine(GloryEffects("Charms glorified by the Gods of Nail and Shell"));
 					}
 					if (PlayerData.instance.killedPaintmaster && !PantheonGlorified(2) && !glorified_this_update)
 					{
@@ -405,7 +428,7 @@ namespace Exaltation
 						Settings.FotFShade = pd.gotShadeCharm ? true : false;
 						Settings.NMGPatience = pd.gotShadeCharm ? false : true;
 						glorified_this_update = true;
-						hc.StartCoroutine(GloryEffects("Charms glorified by the god of creation"));
+						hc.StartCoroutine(GloryEffects("Charms glorified by the God Inspired"));
 					}
 					if (PlayerData.instance.killedNailsage && !PantheonGlorified(3) && !glorified_this_update)
 					{
@@ -415,7 +438,7 @@ namespace Exaltation
 						Settings.SprintmasterGlorified = true;
 						Settings.SharpShadowGlorified = true;
 						glorified_this_update = true;
-						hc.StartCoroutine(GloryEffects("Charms glorified by the god of opportunity"));
+						hc.StartCoroutine(GloryEffects("Charms glorified by the God of Wealth and Power"));
 					}
 					if (PlayerData.instance.killedHollowKnightPrime && !PantheonGlorified(4) && !glorified_this_update)
 					{
@@ -425,7 +448,36 @@ namespace Exaltation
 						Settings.QuickFocusGlorified = true;
 						Settings.HivebloodGlorified = true;
 						glorified_this_update = true;
-						hc.StartCoroutine(GloryEffects("Charms glorified by the god of nothingness"));
+						hc.StartCoroutine(GloryEffects("Charms glorified by the God of Nothingness"));
+					}
+					if (PlayerData.instance.gotShadeCharm)
+					{
+						if (PlayerData.instance.statueStateRadiance.completedTier1 && Settings.VoidLevel < 1 && !glorified_this_update)
+						{
+							Settings.VoidLevel++;
+							glorified_this_update = true;
+							hc.StartCoroutine(GloryEffects("Vessel glorified by the God of Light"));
+						}
+						if (PlayerData.instance.killedVoidIdol_2 && VoidLevel(1) && !glorified_this_update)
+						{
+							Settings.VoidLevel++;
+							glorified_this_update = true;
+							hc.StartCoroutine(GloryEffects("Vessel glorified by the God of Gods"));
+						}
+					}
+				}
+				if (PlayerData.instance.statueStateSly.completedTier1 && WearingGlorifiedCharm("NailmastersGlory"))
+				{
+					PlayerData.instance.statueStateSly.completedTier1 = false;
+					if (!Settings.NMGPatience)
+					{
+						Settings.NMGPatience = true;
+						hc.StartCoroutine(GloryEffects("Nailsage's Tenacy ensorcelled with the power of the Kingsoul"));
+					}
+					else
+					{
+						Settings.NMGPatience = false;
+						hc.StartCoroutine(GloryEffects("Sagesoul imbued with the tenacity of a nailsage"));
 					}
 				}
 			}
@@ -459,9 +511,11 @@ namespace Exaltation
 		private int TakeDamage(int amount)
 		{
 			PlayerData pd = PlayerData.instance;
-			if(pd.maxHealth <= amount) //only protect from damage if we aren't at max health; mainly for radiant bosses
+			if (pd.maxHealth <= amount) //only protect from damage if we aren't at max health; mainly for radiant bosses
 				return amount;
-			if(amount >= 2 && pd.MPCharge >= KingsmouldCarapaceSoulCost && WearingGlorifiedCharm("StalwartShell"))
+			if(EquippedVoidLevel(2) && amount >= 2) //abyssal tuner protects from a lot of damage
+				amount--;
+			else if(amount >= 2 && pd.MPCharge >= KingsmouldCarapaceSoulCost && WearingGlorifiedCharm("StalwartShell"))
 			{
 				amount--; // reduces high damage by 1 mask!
 				HeroController.instance.TakeMP(KingsmouldCarapaceSoulCost);
@@ -494,6 +548,10 @@ namespace Exaltation
 				masks += 2;
 			if (WearingGlorifiedCharm("JonisBlessing"))
 				masks += 4; //BIG MASKS
+			if (EquippedVoidLevel(1))
+				masks += 3;
+			if (EquippedVoidLevel(2))
+				masks = (int)(masks * 1.5f);
 			return masks;
 		}
 
@@ -512,6 +570,18 @@ namespace Exaltation
 				if (WearingGlorifiedCharm("Dashmaster"))
 					HeroController.instance.RUN_SPEED_CH_COMBO = BASE_SPEED_CH_GLORYMACHINEWOKE * mod;
 			}
+			if (EquippedVoidLevel(1))
+			{
+				HeroController.instance.RUN_SPEED *= 1.05f;
+				HeroController.instance.RUN_SPEED_CH *= 1.05f;
+				HeroController.instance.RUN_SPEED_CH_COMBO *= 1.05f;
+			}
+			else if (EquippedVoidLevel(2))
+			{
+				HeroController.instance.RUN_SPEED *= 1.25f;
+				HeroController.instance.RUN_SPEED_CH *= 1.25f;
+				HeroController.instance.RUN_SPEED_CH_COMBO *= 1.25f;
+			}
 		}
 
 		private int GainSoul(int amount)
@@ -527,17 +597,25 @@ namespace Exaltation
 				amount += 3; //Vanilla soul eater is +8, so +3 = +11% - double the base!
 			if (WearingGlorifiedCharm("NailmastersGlory") && Settings.NMGPatience && amount >= NAILSAGE_SOUL_REGEN + 1)
 				amount = NAILSAGE_SOUL_REGEN + 1; //allow synergization but don't make it overpowered
+			if (EquippedVoidLevel(1))
+				amount += 5; //Voidtuner grants high soul gain
+			else if (EquippedVoidLevel(2))
+				amount = 33; //Abyssal Tuner grants massive soul gain
 			return amount;
 		}
 
 		private HitInstance HitInstanceAdjust(Fsm owner, HitInstance hit)
 		{
+			if (EquippedVoidLevel(1)) //Voidtuner adds +5% to damage
+				hit.DamageDealt = (int)(hit.DamageDealt * 1.05f);
+			else if (EquippedVoidLevel(2)) //Abyssal Tuner adds +50% to damage
+				hit.DamageDealt = (int)(hit.DamageDealt * 1.5f);
 			if (hit.Source.transform != null)
 			{
 				string ParentName = hit.Source.transform.parent.name; //note - for many attacks this will be null; be careful
 				if (ParentName != null && ParentName == "Thorn Hit" && IsGlorified("ThornsOfAgony"))
 				{
-					hit.DamageDealt = (int)(hit.DamageDealt * 1.5);
+					hit.DamageDealt = (int)(hit.DamageDealt * 1.5f);
 					hit.AttackType = AttackTypes.Spell; //palace rose thorns are spell-type instead of normal-type
 				}
 			}
@@ -622,6 +700,18 @@ namespace Exaltation
 				CharmIconList.Instance.spriteList[6] = Sprites["Exaltation.Resources.Charms.6_shade.png"];
 			if (IsGlorified("NailmastersGlory") && Settings.NMGPatience) //and NMG is different entirely if made with the kingsoul
 				CharmIconList.Instance.spriteList[26] = Sprites["Exaltation.Resources.Charms.26_patience.png"];
+			if (IsGlorified("WaywardCompass"))
+			{
+				switch (Settings.VoidLevel)
+				{
+					case 1:
+						CharmIconList.Instance.spriteList[2] = Sprites["Exaltation.Resources.Charms.Voidtuner.png"];
+						break;
+					case 2:
+						CharmIconList.Instance.spriteList[2] = Sprites["Exaltation.Resources.Charms.AbyssalTuner.png"];
+						break;
+				}
+			}
 		}
 
 		private void MakeCanvas()
@@ -839,6 +929,18 @@ namespace Exaltation
 					Settings.QuickFocusGlorified &&
 					Settings.HivebloodGlorified;
 			return false;
+		}
+
+		private bool VoidLevel(int level)
+		{
+			if (!PlayerData.instance.gotShadeCharm || !IsGlorified("WaywardCompass"))
+				return false;
+			return Settings.VoidLevel == level;
+		}
+
+		private bool EquippedVoidLevel(int level)
+		{
+			return VoidLevel(level) && WearingGlorifiedCharm("WaywardCompass");
 		}
 
 		public override void Initialize()

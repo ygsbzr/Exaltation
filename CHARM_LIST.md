@@ -106,6 +106,8 @@ Sagesoul causes nail hits to gain no SOUL and deal spell damage instead of nail 
 
 Nailsage's Tenacity increases nail damage by 3% per mask of missing health.
 
+Defeat Sly in the Hall of Gods on Attuned difficulty to swap between the two.
+
 ## Joni's Blessing -> Joni's Benediction
 
 ![Joni](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/27.png?raw=true)
@@ -116,7 +118,7 @@ Provides four additional lifeblood masks.
 
 ![HB](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/29.png?raw=true)
 
-Costs three notches instead of four, and regenerates health twice as fast.
+Costs three notches instead of four, and regenerates health 20% faster.
 
 ## Dashmaster -> Marathon Master
 
@@ -143,3 +145,19 @@ Increases spell damage depending on remaining SOUL after cast. Every 3 SOUL incr
 
 Increases movement speed by 40%, instead of 20%.
 Combine with Racemaster for shenanigans.
+
+## Voidtuner
+
+![Tuner](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/Voidtuner.png?raw=true)
+
+Defeat the Absolute Radiance in the Hall of Gods to unlock this charm.
+
+Slightly increases all stats. Costs no charm notches.
+
+## Abyssal Tuner
+
+![Tuner2](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/AbyssalTuner.png?raw=true)
+
+Defeat all bosses on Ascended difficulty to unlock this charm.
+
+Massively increases all stats. Costs no charm notches.

@@ -27,6 +27,8 @@ namespace Exaltation
 		public bool SpellTwisterGlorified { get => GetBool(); set => SetBool(value); } //33
 		public bool SprintmasterGlorified { get => GetBool(); set => SetBool(value); } //37
 
+		public int VoidLevel { get => GetInt(); set => SetInt(value); }
+
 		public bool FotFShade { get => GetBool(); set => SetBool(value); }
 		public bool NMGPatience { get => GetBool(); set => SetBool(value); }
 

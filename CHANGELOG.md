@@ -2,6 +2,11 @@
 
 Entries here are sorted in descending order depending on age; oldest entries will be the farthest down.
 
+## v1.0.3
+
+* Added the Voidtuner and Abyssal Tuner charms.
+* Nailsage's Tenacity and Sagesoul can be swapped by defeating a nailsage in the Hall of Gods.
+
 ## v1.0.2.2
 
 * White Sprig is now Garden Sprig, and has a new sprite.
