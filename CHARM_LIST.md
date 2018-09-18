@@ -129,7 +129,7 @@ Glorified by completing the Pantheon of the Sage with SOUL bound or defeating as
 
 ![Womb](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/22.png?raw=true)
 
-Spawns hatchlings 50% faster, and has 8 maximum hatchlings, up from 4.
+Spawns hatchlings 50% faster, and has 8 maximum hatchlings, up from 4. Costs 4 SOUL per hatchling instead of 8.
 
 Glorified by defeating Paintmaster Sheo.
 
