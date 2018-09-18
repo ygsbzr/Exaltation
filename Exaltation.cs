@@ -30,18 +30,20 @@ namespace Exaltation
 		private const float BASE_FOCUS_SPEED_CH = 0.018f;
 		private const float SWIFT_FOCUS_SPEED_CH = 0.01f;
 
-		private const float BASE_ATTACK_DURATION_CH = 0.25f;
-		private const float BASE_ATTACK_RECOVERY_CH = 0.25f;
+		private const float BASE_ATTACK_DURATION_CH = 0.28f;
+		private const float BASE_ATTACK_COOLDOWN_CH = 0.25f;
 		private const float STEEL_TEMPEST_ATTACK_DURATION = 0.1f;
 		private const float STEEL_TEMPEST_ATTACK_COOLDOWN = 0.05f;
 
 		private const float BASE_HIVEBLOOD_SPEED = 5f; //10 seconds
 		private const float AMPOULE_HIVEBLOOD_SPEED = 4f; //8 seconds
 
+		private const int BASE_HATCHLING_COST = 8;
+
 		private float StoneshellRegenTime = 0f;
 		private const float STONESHELL_REGEN_WAIT = 10f;
 
-		private const int MONOMON_LENS_SOUL_PER_DAMAGE = 3;
+		private const int MONOMON_LENS_SOUL_PER_DAMAGE = 4;
 		private const float MONOMON_LENS_MAX_INCREASE = 25;
 
 		private float NailsageRegenTime = 0f;
@@ -59,6 +61,9 @@ namespace Exaltation
 		private Text TextObject;
 		private GameObject WyrmfuryIcon;
 
+		private bool DebugNoGlorification = false; //Set this to true to disable all glorifications
+		private bool DebugAllGlories = false; //Set this to true to make all charms eligible for glorification
+
 		internal static Exaltation Instance;
 		public override string GetVersion() => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 		internal Dictionary<string, Sprite> Sprites;
@@ -68,7 +73,7 @@ namespace Exaltation
 		private static readonly FieldInfo SpriteField = typeof(HeroController).GetField("spriteFlash", BindingFlags.Instance | BindingFlags.NonPublic);
 		private static FieldInfo ShadowDashCD = typeof(HeroController).GetField("shadowDashTimer", BindingFlags.NonPublic | BindingFlags.Instance);
 
-		private int[] CharmNums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 16, 19, 20, 21, 26, 27, 29, 31, 32, 33, 35, 37 }; //the charm numbers that can be glorified go here for sprites and the like
+		private int[] CharmNums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 16, 19, 20, 21, 22, 26, 27, 29, 31, 32, 33, 35, 37 }; //the charm numbers that can be glorified go here for sprites and the like
 
 		public void OnHeroUpdate()
 		{
@@ -98,40 +103,21 @@ namespace Exaltation
 					KingsmouldCarapaceTimer = KINGSMOULD_REGEN_WAIT;
 				}
 			}
-			/*if (Input.GetKeyDown(KeyCode.H)) // Uncomment this for debug purposes.
+			/*if (Input.GetKeyDown(KeyCode.H))
 			{
-				bool glorified = Settings.SprintmasterGlorified;
-				Settings.SprintmasterGlorified = glorified;
-				Settings.DashmasterGlorified = glorified;
-				Settings.StalwartShellGlorified = glorified;
-				Settings.GatheringSwarmGlorified = glorified;
-				Settings.ShamanStoneGlorified = glorified;
-				Settings.GrubsongGlorified = glorified;
-				Settings.QuickSlashGlorified = glorified;
-				Settings.FuryOfTheFallenGlorified = glorified;
-				Settings.HivebloodGlorified = glorified;
-				Settings.SoulCatcherGlorified = glorified;
-				Settings.QuickFocusGlorified = glorified;
-				Settings.SharpShadowGlorified = glorified;
-				Settings.LifebloodCoreGlorified = glorified;
-				Settings.LifebloodHeartGlorified = glorified;
-				Settings.BaldurShellGlorified = glorified;
-				Settings.SoulEaterGlorified = glorified;
-				Settings.JonisBlessingGlorified = glorified;
-				Settings.SpellTwisterGlorified = glorified;
-				Settings.WaywardCompassGlorified = glorified;
-				Log("Charm glorification set to " + glorified);
+				DebugNoGlorification = !DebugNoGlorification;
+				Log("No charm glorification set to " + DebugNoGlorification);
 			}
 			if (Input.GetKeyDown(KeyCode.J))
 			{
-				Settings.FotFShade = !Settings.FotFShade;
-				Settings.NMGPatience = !Settings.NMGPatience;
-				Log("NMG + FotF flavor switched");
+				DebugAllGlories = !DebugAllGlories;
+				Log("All glorifications set to " + DebugAllGlories);
 			}
 			if (Input.GetKeyDown(KeyCode.K))
 			{
-				HeroController.instance.StartCoroutine(GloryEffects("Glorified by the god of Testing"));
-				Log("Glorification effects tested");
+				foreach (int i in CharmNums)
+					GlorifyCharm(i.ToString(), false);
+				Log("Removing all glorifications");
 			}*/
 			if (HeroController.instance.cState.nearBench && (WearingGlorifiedCharm("SoulCatcher") || WearingGlorifiedCharm("SoulEater")))
 				HeroController.instance.AddMPChargeSpa(1);
@@ -144,8 +130,6 @@ namespace Exaltation
 					HeroController.instance.AddMPCharge(GainSoul(NAILSAGE_SOUL_REGEN));
 				}
 			}
-			if (EquippedVoidLevel(2))
-				((SpriteFlash)SpriteField.GetValue(HeroController.instance)).flash(Color.black, 1f, 0f, 0.8f, 0.2f);
 		}
 
 		public string LanguageGet(string key, string sheet)
@@ -160,33 +144,12 @@ namespace Exaltation
 			}
 			if (IsGlorified("WaywardCompass"))
 			{
-				if (!PlayerData.instance.gotShadeCharm)
-				{
-					if (key == "CHARM_NAME_2")
-						return "Lifeseed Lantern";
-					else if (key == "CHARM_DESC_2")
-						return "Glass lantern containing a Lifeseed. It is said that Lifeseeds' antennae will always face northward.\n\n" +
-							"The bearer will be able to pinpoint their current location on their map, and gain a very modest lifeblood coating.\n\n" +
-							"Requires no charm notches.";
-				}
-				else if (VoidLevel(1))
-				{
-					if (key == "CHARM_NAME_2")
-						return "Voidtuner";
-					else if (key == "CHARM_DESC_2")
-						return "Tuning device that resonates with the gods of Hallownest. It seeps with black liquid.\n\n" +
-							"Enhances the bearing vessel through unification of the void.\n\n" +
-							"Requires no charm notches.";
-				}
-				else if (VoidLevel(2))
-				{
-					if (key == "CHARM_NAME_2")
-						return "Abyssal Tuner";
-					else if (key == "CHARM_DESC_2")
-						return "Tuning device that resonates with the gods of Hallownest. It drips with black liquid.\n\n" +
-							"Imbues the bearer with freakish strength, speed, and endurance.\n\n" +
-							"Requires no charm notches.";
-				}
+				if (key == "CHARM_NAME_2")
+					return "Lifeseed Lantern";
+				else if (key == "CHARM_DESC_2")
+					return "Glass lantern containing a Lifeseed. It is said that Lifeseeds' antennae will always face northward.\n\n" +
+						"The bearer will be able to pinpoint their current location on their map, and gain a very modest lifeblood coating.\n\n" +
+						"Requires no charm notches.";
 			}
 			if (IsGlorified("Grubsong"))
 			{
@@ -296,6 +259,14 @@ namespace Exaltation
 					return "Void liquid contained in a metal vessel, perfectly still. Endlessly consumes SOUL from the world around it.\n\n" +
 						"Incomparably increases the amount of SOUL gained when striking an enemy with the nail, and quickly regenerates SOUL while at a bench.";
 			}
+			if (IsGlorified("GlowingWomb"))
+			{
+				if (key == "CHARM_NAME_22")
+					return "Primal Womb";
+				else if (key == "CHARM_DESC_22")
+					return "Contains the innate will to propogate one's kind.\n\n" +
+						"Rapidly drains the bearer's SOUL to create a swarm of hatchlings that will defend their parent.";
+			}
 			if (IsGlorified("NailmastersGlory"))
 			{
 				if (key == "CHARM_NAME_26")
@@ -403,68 +374,20 @@ namespace Exaltation
 				MakeCanvas();
 			else
 			{
-				bool glorified_this_update = false;
 				if (hc != null)
 				{
-					if (PlayerData.instance.killedNailBros && !PantheonGlorified(1) && !glorified_this_update)
+					bool glorified_this_update = false;
+					foreach (int i in CharmNums)
 					{
-						Settings.GatheringSwarmGlorified = true;
-						Settings.WaywardCompassGlorified = true;
-						Settings.GrubsongGlorified = true;
-						Settings.StalwartShellGlorified = true;
-						Settings.BaldurShellGlorified = true;
-						Settings.SteadyBodyGlorified = true;
-						glorified_this_update = true;
-						hc.StartCoroutine(GloryEffects("Charms glorified by the Gods of Nail and Shell"));
-					}
-					if (PlayerData.instance.killedPaintmaster && !PantheonGlorified(2) && !glorified_this_update)
-					{
-						Settings.LifebloodHeartGlorified = true;
-						Settings.LifebloodCoreGlorified = true;
-						Settings.JonisBlessingGlorified = true;
-						Settings.FuryOfTheFallenGlorified = true;
-						Settings.ThornsOfAgonyGlorified = true;
-						Settings.NailmastersGloryGlorified = true;
-						Settings.FotFShade = pd.gotShadeCharm ? true : false;
-						Settings.NMGPatience = pd.gotShadeCharm ? false : true;
-						glorified_this_update = true;
-						hc.StartCoroutine(GloryEffects("Charms glorified by the God Inspired"));
-					}
-					if (PlayerData.instance.killedNailsage && !PantheonGlorified(3) && !glorified_this_update)
-					{
-						Settings.SoulCatcherGlorified = true;
-						Settings.SoulEaterGlorified = true;
-						Settings.DashmasterGlorified = true;
-						Settings.SprintmasterGlorified = true;
-						Settings.SharpShadowGlorified = true;
-						glorified_this_update = true;
-						hc.StartCoroutine(GloryEffects("Charms glorified by the God of Wealth and Power"));
-					}
-					if (PlayerData.instance.killedHollowKnightPrime && !PantheonGlorified(4) && !glorified_this_update)
-					{
-						Settings.ShamanStoneGlorified = true;
-						Settings.SpellTwisterGlorified = true;
-						Settings.QuickSlashGlorified = true;
-						Settings.QuickFocusGlorified = true;
-						Settings.HivebloodGlorified = true;
-						glorified_this_update = true;
-						hc.StartCoroutine(GloryEffects("Charms glorified by the God of Nothingness"));
-					}
-					if (PlayerData.instance.gotShadeCharm)
-					{
-						if (PlayerData.instance.statueStateRadiance.completedTier1 && Settings.VoidLevel < 1 && !glorified_this_update)
+						string s = i.ToString();
+						if (CanGlorify(s) && !IsGlorified(s))
 						{
-							Settings.VoidLevel++;
+							GlorifyCharm(s);
 							glorified_this_update = true;
-							hc.StartCoroutine(GloryEffects("Vessel glorified by the God of Light"));
-						}
-						if (PlayerData.instance.killedVoidIdol_2 && VoidLevel(1) && !glorified_this_update)
-						{
-							Settings.VoidLevel++;
-							glorified_this_update = true;
-							hc.StartCoroutine(GloryEffects("Vessel glorified by the God of Gods"));
 						}
 					}
+					if (glorified_this_update)
+						HeroController.instance.StartCoroutine(GloryEffects("Charms glorified through recent victories"));
 				}
 				if (PlayerData.instance.statueStateSly.completedTier1 && WearingGlorifiedCharm("NailmastersGlory"))
 				{
@@ -491,7 +414,7 @@ namespace Exaltation
 			}
 			else
 			{
-				hc.ATTACK_COOLDOWN_TIME_CH = BASE_ATTACK_RECOVERY_CH;
+				hc.ATTACK_COOLDOWN_TIME_CH = BASE_ATTACK_COOLDOWN_CH;
 				hc.ATTACK_DURATION_CH = BASE_ATTACK_DURATION_CH;
 			}
 			GameObject helf = GameObject.Find("Health");
@@ -500,6 +423,20 @@ namespace Exaltation
 				helf.LocateMyFSM("Hive Health Regen").
 					Fsm.GetFsmFloat("Recover Time").
 					Value = WearingGlorifiedCharm("Hiveblood") ? AMPOULE_HIVEBLOOD_SPEED : BASE_HIVEBLOOD_SPEED;
+			}
+
+			GameObject churm = GameObject.Find("Charm Effects");
+			if (churm != null)
+			{
+				churm.LocateMyFSM("Hatchling Spawn").
+					Fsm.GetFsmInt("Hatchling Max").
+					Value = WearingGlorifiedCharm("GlowingWomb") ? 8 : 4;
+				churm.LocateMyFSM("Hatchling Spawn").
+					Fsm.GetFsmFloat("Hatch Time").	
+					Value = WearingGlorifiedCharm("GlowingWomb") ? 2f : 4f;
+				churm.LocateMyFSM("Hatchling Spawn").
+					Fsm.GetFsmInt("Soul Cost").
+					Value = WearingGlorifiedCharm("GlowingWomb") ? 4 : 8;
 			}
 			hc.spellControl.Fsm.GetFsmFloat("Time Per MP Drain CH").Value = WearingGlorifiedCharm("QuickFocus") ? SWIFT_FOCUS_SPEED_CH : BASE_FOCUS_SPEED_CH;
 			pd.charmCost_2 = IsGlorified("WaywardCompass") ? 0 : 1;
@@ -513,8 +450,6 @@ namespace Exaltation
 			PlayerData pd = PlayerData.instance;
 			if (pd.maxHealth <= amount) //only protect from damage if we aren't at max health; mainly for radiant bosses
 				return amount;
-			if(EquippedVoidLevel(2) && amount >= 2) //abyssal tuner protects from a lot of damage
-				amount--;
 			else if(amount >= 2 && pd.MPCharge >= KingsmouldCarapaceSoulCost && WearingGlorifiedCharm("StalwartShell"))
 			{
 				amount--; // reduces high damage by 1 mask!
@@ -548,10 +483,6 @@ namespace Exaltation
 				masks += 2;
 			if (WearingGlorifiedCharm("JonisBlessing"))
 				masks += 4; //BIG MASKS
-			if (EquippedVoidLevel(1))
-				masks += 3;
-			if (EquippedVoidLevel(2))
-				masks = (int)(masks * 1.5f);
 			return masks;
 		}
 
@@ -570,18 +501,6 @@ namespace Exaltation
 				if (WearingGlorifiedCharm("Dashmaster"))
 					HeroController.instance.RUN_SPEED_CH_COMBO = BASE_SPEED_CH_GLORYMACHINEWOKE * mod;
 			}
-			if (EquippedVoidLevel(1))
-			{
-				HeroController.instance.RUN_SPEED *= 1.05f;
-				HeroController.instance.RUN_SPEED_CH *= 1.05f;
-				HeroController.instance.RUN_SPEED_CH_COMBO *= 1.05f;
-			}
-			else if (EquippedVoidLevel(2))
-			{
-				HeroController.instance.RUN_SPEED *= 1.25f;
-				HeroController.instance.RUN_SPEED_CH *= 1.25f;
-				HeroController.instance.RUN_SPEED_CH_COMBO *= 1.25f;
-			}
 		}
 
 		private int GainSoul(int amount)
@@ -597,20 +516,12 @@ namespace Exaltation
 				amount += 3; //Vanilla soul eater is +8, so +3 = +11% - double the base!
 			if (WearingGlorifiedCharm("NailmastersGlory") && Settings.NMGPatience && amount >= NAILSAGE_SOUL_REGEN + 1)
 				amount = NAILSAGE_SOUL_REGEN + 1; //allow synergization but don't make it overpowered
-			if (EquippedVoidLevel(1))
-				amount += 5; //Voidtuner grants high soul gain
-			else if (EquippedVoidLevel(2))
-				amount = 33; //Abyssal Tuner grants massive soul gain
 			return amount;
 		}
 
 		private HitInstance HitInstanceAdjust(Fsm owner, HitInstance hit)
 		{
-			if (EquippedVoidLevel(1)) //Voidtuner adds +5% to damage
-				hit.DamageDealt = (int)(hit.DamageDealt * 1.05f);
-			else if (EquippedVoidLevel(2)) //Abyssal Tuner adds +50% to damage
-				hit.DamageDealt = (int)(hit.DamageDealt * 1.5f);
-			if (hit.Source.transform != null)
+			if (hit.Source.transform.parent != null)
 			{
 				string ParentName = hit.Source.transform.parent.name; //note - for many attacks this will be null; be careful
 				if (ParentName != null && ParentName == "Thorn Hit" && IsGlorified("ThornsOfAgony"))
@@ -700,18 +611,6 @@ namespace Exaltation
 				CharmIconList.Instance.spriteList[6] = Sprites["Exaltation.Resources.Charms.6_shade.png"];
 			if (IsGlorified("NailmastersGlory") && Settings.NMGPatience) //and NMG is different entirely if made with the kingsoul
 				CharmIconList.Instance.spriteList[26] = Sprites["Exaltation.Resources.Charms.26_patience.png"];
-			if (IsGlorified("WaywardCompass"))
-			{
-				switch (Settings.VoidLevel)
-				{
-					case 1:
-						CharmIconList.Instance.spriteList[2] = Sprites["Exaltation.Resources.Charms.Voidtuner.png"];
-						break;
-					case 2:
-						CharmIconList.Instance.spriteList[2] = Sprites["Exaltation.Resources.Charms.AbyssalTuner.png"];
-						break;
-				}
-			}
 		}
 
 		private void MakeCanvas()
@@ -774,6 +673,10 @@ namespace Exaltation
 
 		private bool IsGlorified(string CharmName) //quick function for checking if a charm is glorified
 		{
+			if (DebugNoGlorification)
+				return false;
+			if (DebugAllGlories)
+				return true;
 			CharmName = CharmName.ToLower(); //prevent case entry from changing it up
 			switch (CharmName)
 			{
@@ -819,6 +722,9 @@ namespace Exaltation
 				case "soulcatcher":
 				case "20":
 					return Settings.SoulCatcherGlorified;
+				case "glowingwomb":
+				case "22":
+					return Settings.GlowingWombGlorified;
 				case "souleater":
 				case "21":
 					return Settings.SoulEaterGlorified;
@@ -845,6 +751,189 @@ namespace Exaltation
 					return Settings.SprintmasterGlorified;
 			}
 			return false;
+		}
+
+		private bool CanGlorify(string CharmName)
+		{
+			CharmName = CharmName.ToLower(); //prevent case entry from changing it up
+			PlayerData pd = PlayerData.instance;
+			if (DebugAllGlories)
+				return true;
+			if (DebugNoGlorification)
+				return false;
+			switch (CharmName)
+			{
+				case "gatheringswarm":
+				case "1":
+					return pd.killedNailBros;
+				case "waywardcompass":
+				case "2":
+					return pd.killedNailBros;
+				case "grubsong":
+				case "3":
+					return pd.bossDoorStateTier1.boundSoul || pd.statueStateCollector.completedTier2;
+				case "stalwartshell":
+				case "4":
+					return pd.bossDoorStateTier1.boundShell || pd.statueStateFailedChampion.completedTier2;
+				case "baldurshell":
+				case "5":
+					return pd.killedNailBros;
+				case "furyofthefallen":
+				case "6":
+					return pd.killedNailBros;
+				case "quickfocus":
+				case "7":
+					return pd.bossDoorStateTier4.boundSoul || pd.statueStateHollowKnight.completedTier3;
+				case "lifebloodheart":
+				case "8":
+					return pd.killedPaintmaster;
+				case "lifebloodcore":
+				case "9":
+					return pd.killedPaintmaster;
+				case "thornsofagony":
+				case "12":
+					return pd.killedPaintmaster;
+				case "steadybody":
+				case "14":
+					return pd.killedNailBros;
+				case "sharpshadow":
+				case "16":
+					return pd.bossDoorStateTier3.boundNail || pd.statueStateNosk.completedTier2;
+				case "shamanstone":
+				case "19":
+					return pd.bossDoorStateTier3.boundShell || pd.statueStateSoulTyrant.completedTier2;
+				case "soulcatcher":
+				case "20":
+					return pd.killedNailsage;
+				case "souleater":
+				case "21":
+					return pd.bossDoorStateTier3.boundSoul || pd.statueStateSly.completedTier2;
+				case "glowingwomb":
+				case "22":
+					return pd.killedPaintmaster;
+				case "nailmastersglory":
+				case "26":
+					return pd.killedNailsage;
+				case "jonisblessing":
+				case "27":
+					return pd.bossDoorStateTier3.boundShell || pd.statueStateSly.completedTier3;
+				case "hiveblood":
+				case "29":
+					return pd.killedHollowKnightPrime;
+				case "dashmaster":
+				case "31":
+					return pd.killedPaintmaster;
+				case "quickslash":
+				case "32":
+					return pd.bossDoorStateTier4.boundNail || pd.statueStateNailmasters.completedTier3;
+				case "spelltwister":
+				case "33":
+					return pd.bossDoorStateTier2.boundSoul || pd.statueStateUumuu.completedTier2;
+				case "sprintmaster":
+				case "37":
+					return pd.killedPaintmaster;
+			}
+			return false;
+		}
+
+		private void GlorifyCharm(string CharmName, bool GloryAdjust = true)
+		{
+			CharmName = CharmName.ToLower();
+			switch (CharmName)
+			{
+				case "gatheringswarm":
+				case "1":
+					Settings.GatheringSwarmGlorified = GloryAdjust;
+					break;
+				case "waywardcompass":
+				case "2":
+					Settings.WaywardCompassGlorified = GloryAdjust;
+					break;
+				case "grubsong":
+				case "3":
+					Settings.GrubsongGlorified = GloryAdjust;
+					break;
+				case "stalwartshell":
+				case "4":
+					Settings.StalwartShellGlorified = GloryAdjust;
+					break;
+				case "baldurshell":
+				case "5":
+					Settings.BaldurShellGlorified = GloryAdjust;
+					break;
+				case "furyofthefallen":
+				case "6":
+					Settings.FuryOfTheFallenGlorified = GloryAdjust;
+					break;
+				case "quickfocus":
+				case "7":
+					Settings.QuickFocusGlorified = GloryAdjust;
+					break;
+				case "lifebloodheart":
+				case "8":
+					Settings.LifebloodHeartGlorified = GloryAdjust;
+					break;
+				case "lifebloodcore":
+				case "9":
+					Settings.LifebloodCoreGlorified = GloryAdjust;
+					break;
+				case "thornsofagony":
+				case "12":
+					Settings.ThornsOfAgonyGlorified = GloryAdjust;
+					break;
+				case "steadybody":
+				case "14":
+					Settings.SteadyBodyGlorified = GloryAdjust;
+					break;
+				case "sharpshadow":
+				case "16":
+					Settings.SharpShadowGlorified = GloryAdjust;
+					break;
+				case "shamanstone":
+				case "19":
+					Settings.ShamanStoneGlorified = GloryAdjust;
+					break;
+				case "soulcatcher":
+				case "20":
+					Settings.SoulCatcherGlorified = GloryAdjust;
+					break;
+				case "souleater":
+				case "21":
+					Settings.SoulEaterGlorified = GloryAdjust;
+					break;
+				case "glowingwomb":
+				case "22":
+					Settings.GlowingWombGlorified = GloryAdjust;
+					break;
+				case "nailmastersglory":
+				case "26":
+					Settings.NailmastersGloryGlorified = GloryAdjust;
+					break;
+				case "jonisblessing":
+				case "27":
+					Settings.JonisBlessingGlorified = GloryAdjust;
+					break;
+				case "hiveblood":
+				case "29":
+					Settings.HivebloodGlorified = GloryAdjust;
+					break;
+				case "dashmaster":
+				case "31":
+					Settings.DashmasterGlorified = GloryAdjust;
+					break;
+				case "quickslash":
+				case "32":
+					Settings.QuickSlashGlorified = GloryAdjust;
+					break;
+				case "spelltwister":
+				case "33":
+					Settings.SpellTwisterGlorified = GloryAdjust;
+					break;
+				case "sprintmaster":
+				case "37":
+					Settings.SprintmasterGlorified = GloryAdjust;
+					break;
+			}
 		}
 
 		private bool WearingGlorifiedCharm(string CharmName) //sister function to IsGlorified to check if the player is wearing it
@@ -882,6 +971,8 @@ namespace Exaltation
 					return Settings.SoulCatcherGlorified && PlayerData.instance.equippedCharm_20;
 				case "souleater":
 					return Settings.SoulEaterGlorified && PlayerData.instance.equippedCharm_21;
+				case "glowingwomb":
+					return Settings.GlowingWombGlorified && PlayerData.instance.equippedCharm_22;
 				case "nailmastersglory":
 					return Settings.NailmastersGloryGlorified && PlayerData.instance.equippedCharm_26;
 				case "jonisblessing":
@@ -898,49 +989,6 @@ namespace Exaltation
 					return Settings.SprintmasterGlorified && PlayerData.instance.equippedCharm_37;
 			}
 			return false;
-		}
-
-		private bool PantheonGlorified(int pantheon) //this double-checks that everything is set so that past saves are compatible with new updates
-		{
-			if (pantheon == 1) //tried a switch here, it broke everything
-				return Settings.GatheringSwarmGlorified &&
-					Settings.WaywardCompassGlorified &&
-					Settings.GrubsongGlorified &&
-					Settings.StalwartShellGlorified &&
-					Settings.BaldurShellGlorified &&
-					Settings.SteadyBodyGlorified;
-			else if (pantheon == 2)
-				return Settings.LifebloodHeartGlorified &&
-					Settings.LifebloodCoreGlorified &&
-					Settings.JonisBlessingGlorified &&
-					Settings.FuryOfTheFallenGlorified &&
-					Settings.ThornsOfAgonyGlorified &&
-					Settings.NailmastersGloryGlorified;
-			else if (pantheon == 3)
-				return Settings.SoulCatcherGlorified &&
-					Settings.SoulEaterGlorified &&
-					Settings.DashmasterGlorified &&
-					Settings.SprintmasterGlorified &&
-					Settings.SharpShadowGlorified;
-			else if (pantheon == 4)
-				return Settings.ShamanStoneGlorified &&
-					Settings.SpellTwisterGlorified &&
-					Settings.QuickSlashGlorified &&
-					Settings.QuickFocusGlorified &&
-					Settings.HivebloodGlorified;
-			return false;
-		}
-
-		private bool VoidLevel(int level)
-		{
-			if (!PlayerData.instance.gotShadeCharm || !IsGlorified("WaywardCompass"))
-				return false;
-			return Settings.VoidLevel == level;
-		}
-
-		private bool EquippedVoidLevel(int level)
-		{
-			return VoidLevel(level) && WearingGlorifiedCharm("WaywardCompass");
 		}
 
 		public override void Initialize()

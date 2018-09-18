@@ -2,6 +2,13 @@
 
 Entries here are sorted in descending order depending on age; oldest entries will be the farthest down.
 
+## v1.0.4
+
+* Removed the Voidtuner and Abyssal Tuner.
+* Added the Primal Womb.
+* Many charm glorifications are now locked behind bindings or Hall of Gods challenges. See the Charm List for full details.
+* Fixed vanilla Quick Slash values not being equal to those of default.
+
 ## v1.0.3
 
 * Added the Voidtuner and Abyssal Tuner charms.

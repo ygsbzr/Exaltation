@@ -19,6 +19,7 @@ namespace Exaltation
 		public bool ShamanStoneGlorified { get => GetBool(); set => SetBool(value); } //19
 		public bool SoulCatcherGlorified { get => GetBool(); set => SetBool(value); } //20
 		public bool SoulEaterGlorified { get => GetBool(); set => SetBool(value); } //21
+		public bool GlowingWombGlorified { get => GetBool(); set => SetBool(value); } //22
 		public bool NailmastersGloryGlorified { get => GetBool(); set => SetBool(value); } //26... and a little redundant
 		public bool JonisBlessingGlorified { get => GetBool(); set => SetBool(value); } //27
 		public bool HivebloodGlorified { get => GetBool(); set => SetBool(value); } //29
@@ -26,8 +27,6 @@ namespace Exaltation
 		public bool QuickSlashGlorified { get => GetBool(); set => SetBool(value); } //32
 		public bool SpellTwisterGlorified { get => GetBool(); set => SetBool(value); } //33
 		public bool SprintmasterGlorified { get => GetBool(); set => SetBool(value); } //37
-
-		public int VoidLevel { get => GetInt(); set => SetInt(value); }
 
 		public bool FotFShade { get => GetBool(); set => SetBool(value); }
 		public bool NMGPatience { get => GetBool(); set => SetBool(value); }

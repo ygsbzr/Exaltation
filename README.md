@@ -8,15 +8,11 @@ Created by Xhuis with a lot of help from modders in the Hollow Knight Discord, i
 
 * Complete each Pantheon to gain the power of its god, and rest at a bench to glorify their charms.
 * Each Pantheon "glorifies" a set of your charms, making them more powerful.
+* The strongest charms are locked behind challenges in the Hall of Gods, or through completing Pantheons with bindings active.
 * Most, but not all, charms have glorified variants.
 * *Glorification is currently one-way.* This might change in the future.
 
 ![](https://i.imgur.com/SFrBFlq.png)
-
-* **Pantheon of the Master** - Gathering Swarm, Wayward Compass, Grubsong, Stalwart Shell, Baldur Shell, Steady Body
-* **Pantheon of the Artist** - Lifeblood Core, Lifeblood Heart, Joni's Blessing, Fury of the Fallen, Nailmaster's Glory
-* **Pantheon of the Sage** - Soul Catcher, Soul Eater, Dashmaster, Sprintmaster, Sharp Shadow
-* **Pantheon of the Knight** - Shaman Stone, Spell Twister, Quick Slash, Quick Focus, Hiveblood
 
 A full list of glorifications can be found [here](https://github.com/Xhuis/Exaltation/blob/master/CHARM_LIST.md). Note that this file contains **spoilers!**
 
