@@ -55,6 +55,8 @@ namespace Exaltation
 		private int KingsmouldCarapaceSoulCost = KINGSMOULD_CARAPACE_BASE_SOUL;
 		private float KingsmouldCarapaceTimer = 0f;
 
+		private const int DREAM_CATCHER_COST = 10;
+
 		private bool WyrmfuryDeathProtection = true;
 		private GameObject CanvasObject;
 		private GameObject TextCanvas; //use a different canvas for text since it's handled differently
@@ -73,7 +75,7 @@ namespace Exaltation
 		private static readonly FieldInfo SpriteField = typeof(HeroController).GetField("spriteFlash", BindingFlags.Instance | BindingFlags.NonPublic);
 		private static FieldInfo ShadowDashCD = typeof(HeroController).GetField("shadowDashTimer", BindingFlags.NonPublic | BindingFlags.Instance);
 
-		private int[] CharmNums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 16, 19, 20, 21, 22, 26, 27, 29, 31, 32, 33, 35, 37 }; //the charm numbers that can be glorified go here for sprites and the like
+		private int[] CharmNums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 16, 19, 20, 21, 22, 26, 27, 29, 30, 31, 32, 33, 35, 37 }; //the charm numbers that can be glorified go here for sprites and the like
 
 		public void OnHeroUpdate()
 		{
@@ -295,6 +297,15 @@ namespace Exaltation
 					return "Golden nugget of hardened nectar from the Hive that has been compressed into a metal shell from the Crystal Peak.\n\n" +
 						"Quickly heals the bearer's recent wounds over time, allowing them to regain some health without focusing SOUL.";
 			}
+			if (IsGlorified("DreamWielder"))
+			{
+				if (key == "CHARM_NAME_30")
+					return "Dream Catcher";
+				else if (key == "CHARM_DESC_30")
+					return "Transient charm attuned to the turbulent winds of the dream.\n\n" +
+						"Allows the bearer to charge the Dream Nail faster and collect more SOUL when striking foes.\n\n" +
+						"Nail attacks may draw and expel the user's SOUL as a blast of energy.";
+			}
 			if (IsGlorified("Dashmaster"))	
 			{
 				if(key == "CHARM_NAME_31")
@@ -334,7 +345,7 @@ namespace Exaltation
 		{
 			PlayerData.instance.charmCost_2 = 1;
 			PlayerData.instance.charmCost_14 = 1;
-			PlayerData.instance.charmCost_29 = 3;
+			PlayerData.instance.charmCost_29 = 4;
 			PlayerData.instance.charmCost_31 = 2;
 		}
 
@@ -546,15 +557,28 @@ namespace Exaltation
 			}
 			if (hit.AttackType == AttackTypes.Nail)
 			{
-				if (WearingGlorifiedCharm("QuickSlash"))
-					hit.DamageDealt = (int)(hit.DamageDealt * 0.75f);
 				if (WearingGlorifiedCharm("FuryOfTheFallen") && PlayerData.instance.health == 1)
 					hit.DamageDealt = (int)(hit.DamageDealt * 1.15f);
 				if (WearingGlorifiedCharm("NailmastersGlory"))
+				{
 					if (Settings.NMGPatience) //change this AFTER modifying spell damage to avoid massive damage stacking
 						hit.AttackType = AttackTypes.Spell;
 					else
 						hit.DamageDealt += (int)(hit.DamageDealt * 0.03f * (PlayerData.instance.maxHealth - PlayerData.instance.health));
+				}
+				if (WearingGlorifiedCharm("DreamWielder"))
+				{
+					if (Random.Range(1, 21) == 20)
+					{
+						if (PlayerData.instance.MPCharge >= DREAM_CATCHER_COST)
+						{
+							HeroController.instance.TakeMP(DREAM_CATCHER_COST);
+							HeroController.instance.spell1Prefab.Spawn(HeroController.instance.transform.position + new Vector3(0f, 0.3f));
+							HeroController.instance.GetAttr<AudioSource>("audioSource")
+								.PlayOneShot(LoadAssets.DreamCatcherSound, 1f);
+						}
+					}
+				}
 			}
 			if (hit.AttackType == AttackTypes.SharpShadow && WearingGlorifiedCharm("SharpShadow"))
 				hit.DamageDealt *= 2;
@@ -737,6 +761,9 @@ namespace Exaltation
 				case "hiveblood":
 				case "29":
 					return Settings.HivebloodGlorified;
+				case "dreamwielder":
+				case "30":
+					return Settings.DreamWielderGlorified;
 				case "dashmaster":
 				case "31":
 					return Settings.DashmasterGlorified;
@@ -820,6 +847,9 @@ namespace Exaltation
 				case "hiveblood":
 				case "29":
 					return pd.killedHollowKnightPrime;
+				case "dreamwielder":
+				case "30":
+					return pd.killedHollowKnightPrime;
 				case "dashmaster":
 				case "31":
 					return pd.killedPaintmaster;
@@ -864,6 +894,8 @@ namespace Exaltation
 				case "furyofthefallen":
 				case "6":
 					Settings.FuryOfTheFallenGlorified = GloryAdjust;
+					if (GloryAdjust && PlayerData.instance.gotShadeCharm)
+						Settings.FotFShade = true;
 					break;
 				case "quickfocus":
 				case "7":
@@ -917,6 +949,10 @@ namespace Exaltation
 				case "29":
 					Settings.HivebloodGlorified = GloryAdjust;
 					break;
+				case "dreamwielder":
+				case "30":
+					Settings.DreamWielderGlorified = GloryAdjust;
+					break;
 				case "dashmaster":
 				case "31":
 					Settings.DashmasterGlorified = GloryAdjust;
@@ -939,54 +975,57 @@ namespace Exaltation
 		private bool WearingGlorifiedCharm(string CharmName) //sister function to IsGlorified to check if the player is wearing it
 		{
 			CharmName = CharmName.ToLower();
+			bool glory = IsGlorified(CharmName);
 			switch(CharmName)
 			{
 				case "gatheringswarm":
-					return Settings.GatheringSwarmGlorified && PlayerData.instance.equippedCharm_1;
+					return glory && PlayerData.instance.equippedCharm_1;
 				case "waywardcompass":
-					return Settings.WaywardCompassGlorified && PlayerData.instance.equippedCharm_2;
+					return glory && PlayerData.instance.equippedCharm_2;
 				case "grubsong":
-					return Settings.GrubsongGlorified && PlayerData.instance.equippedCharm_3;
+					return glory && PlayerData.instance.equippedCharm_3;
 				case "stalwartshell":
-					return Settings.StalwartShellGlorified && PlayerData.instance.equippedCharm_4;
+					return glory && PlayerData.instance.equippedCharm_4;
 				case "baldurshell":
-					return Settings.BaldurShellGlorified && PlayerData.instance.equippedCharm_5;
+					return glory && PlayerData.instance.equippedCharm_5;
 				case "furyofthefallen":
-					return Settings.FuryOfTheFallenGlorified && PlayerData.instance.equippedCharm_6;
+					return glory && PlayerData.instance.equippedCharm_6;
 				case "quickfocus":
-					return Settings.QuickFocusGlorified && PlayerData.instance.equippedCharm_7;
+					return glory && PlayerData.instance.equippedCharm_7;
 				case "lifebloodheart":
-					return Settings.LifebloodHeartGlorified && PlayerData.instance.equippedCharm_8;
+					return glory && PlayerData.instance.equippedCharm_8;
 				case "lifebloodcore":
-					return Settings.LifebloodCoreGlorified && PlayerData.instance.equippedCharm_9;
+					return glory && PlayerData.instance.equippedCharm_9;
 				case "thornsofagony":
-					return Settings.ThornsOfAgonyGlorified && PlayerData.instance.equippedCharm_12;
+					return glory && PlayerData.instance.equippedCharm_12;
 				case "steadybody":
-					return Settings.SteadyBodyGlorified && PlayerData.instance.equippedCharm_14;
+					return glory && PlayerData.instance.equippedCharm_14;
 				case "sharpshadow":
-					return Settings.SharpShadowGlorified && PlayerData.instance.equippedCharm_16;
+					return glory && PlayerData.instance.equippedCharm_16;
 				case "shamanstone":
-					return Settings.ShamanStoneGlorified && PlayerData.instance.equippedCharm_19;
+					return glory && PlayerData.instance.equippedCharm_19;
 				case "soulcatcher":
-					return Settings.SoulCatcherGlorified && PlayerData.instance.equippedCharm_20;
+					return glory && PlayerData.instance.equippedCharm_20;
 				case "souleater":
-					return Settings.SoulEaterGlorified && PlayerData.instance.equippedCharm_21;
+					return glory && PlayerData.instance.equippedCharm_21;
 				case "glowingwomb":
-					return Settings.GlowingWombGlorified && PlayerData.instance.equippedCharm_22;
+					return glory && PlayerData.instance.equippedCharm_22;
 				case "nailmastersglory":
-					return Settings.NailmastersGloryGlorified && PlayerData.instance.equippedCharm_26;
+					return glory && PlayerData.instance.equippedCharm_26;
 				case "jonisblessing":
-					return Settings.JonisBlessingGlorified && PlayerData.instance.equippedCharm_27;
+					return glory && PlayerData.instance.equippedCharm_27;
 				case "hiveblood":
-					return Settings.HivebloodGlorified && PlayerData.instance.equippedCharm_29;
+					return glory && PlayerData.instance.equippedCharm_29;
+				case "dreamwielder":
+					return glory && PlayerData.instance.equippedCharm_30;
 				case "dashmaster":
-					return Settings.DashmasterGlorified && PlayerData.instance.equippedCharm_31;
+					return glory && PlayerData.instance.equippedCharm_31;
 				case "quickslash":
-					return Settings.QuickSlashGlorified && PlayerData.instance.equippedCharm_32;
+					return glory && PlayerData.instance.equippedCharm_32;
 				case "spelltwister":
-					return Settings.SpellTwisterGlorified && PlayerData.instance.equippedCharm_33;
+					return glory && PlayerData.instance.equippedCharm_33;
 				case "sprintmaster":
-					return Settings.SprintmasterGlorified && PlayerData.instance.equippedCharm_37;
+					return glory && PlayerData.instance.equippedCharm_37;
 			}
 			return false;
 		}

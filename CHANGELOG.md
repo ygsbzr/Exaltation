@@ -2,6 +2,15 @@
 
 Entries here are sorted in descending order depending on age; oldest entries will be the farthest down.
 
+## v1.0.4.4
+
+* Added the Dream Catcher.
+
+## v1.0.4.3
+
+* Fixed Hiveblood's glorified cost remaining when the mod was uninstalled.
+* Fixed Shadefury not being obtainable.
+
 ## v1.0.4
 
 * Removed the Voidtuner and Abyssal Tuner.

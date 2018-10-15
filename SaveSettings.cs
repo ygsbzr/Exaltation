@@ -23,6 +23,7 @@ namespace Exaltation
 		public bool NailmastersGloryGlorified { get => GetBool(); set => SetBool(value); } //26... and a little redundant
 		public bool JonisBlessingGlorified { get => GetBool(); set => SetBool(value); } //27
 		public bool HivebloodGlorified { get => GetBool(); set => SetBool(value); } //29
+		public bool DreamWielderGlorified { get => GetBool(); set => SetBool(value); } //30
 		public bool DashmasterGlorified { get => GetBool(); set => SetBool(value); } //31
 		public bool QuickSlashGlorified { get => GetBool(); set => SetBool(value); } //32
 		public bool SpellTwisterGlorified { get => GetBool(); set => SetBool(value); } //33

@@ -163,6 +163,14 @@ Costs three notches instead of four, and regenerates health 20% faster.
 
 Glorified by defeating the Pure Vessel.
 
+## Dream Wielder -> Dream Catcher
+
+![DC](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/30.png?raw=true)
+
+Nail attacks may create a vengeful spirit, at the cost of 10 SOUL.
+
+Glorified by defeating the Pure Vessel.
+
 ## Dashmaster -> Marathon Master
 
 ![DM](https://github.com/Xhuis/Exaltation/blob/master/Resources/Charms/31.png?raw=true)

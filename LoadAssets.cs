@@ -11,6 +11,7 @@ namespace Exaltation
 		public static AudioClip WyrmfurySound;
 		public static AudioClip ShellSound;
 		public static AudioClip BlockerSound;
+		public static AudioClip DreamCatcherSound;
 		public static void LoadSounds()
 		{
 			foreach (string res in Assembly.GetExecutingAssembly().GetManifestResourceNames())
@@ -37,12 +38,17 @@ namespace Exaltation
 						else if (res.StartsWith("Exaltation.Resources.ShellProtect"))
 						{
 							ShellSound = WavUtility.ToAudioClip(buffer);
-							Modding.Logger.Log("Found Stalwart Shell sound effect.");
+							Modding.Logger.Log("Found Kingsmould Carapace sound effect.");
 						}
 						else if (res.StartsWith("Exaltation.Resources.BlockerRegen"))
 						{
 							BlockerSound = WavUtility.ToAudioClip(buffer);
-							Modding.Logger.Log("Found Baldur Shell sound effect.");
+							Modding.Logger.Log("Found Baldur Stoneshell sound effect.");
+						}
+						else if (res.StartsWith("Exaltation.Resources.DreamCatcherProc"))
+						{
+							DreamCatcherSound = WavUtility.ToAudioClip(buffer);
+							Modding.Logger.Log("Found Dream Catcher sound effect.");
 						}
 					}
 				}
