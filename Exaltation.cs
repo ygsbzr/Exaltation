@@ -297,15 +297,6 @@ namespace Exaltation
 					return "Golden nugget of hardened nectar from the Hive that has been compressed into a metal shell from the Crystal Peak.\n\n" +
 						"Quickly heals the bearer's recent wounds over time, allowing them to regain some health without focusing SOUL.";
 			}
-			if (IsGlorified("DreamWielder"))
-			{
-				if (key == "CHARM_NAME_30")
-					return "Dream Catcher";
-				else if (key == "CHARM_DESC_30")
-					return "Transient charm attuned to the turbulent winds of the dream.\n\n" +
-						"Allows the bearer to charge the Dream Nail faster and collect more SOUL when striking foes.\n\n" +
-						"Nail attacks may draw and expel the user's SOUL as a blast of energy.";
-			}
 			if (IsGlorified("Dashmaster"))	
 			{
 				if(key == "CHARM_NAME_31")
@@ -566,19 +557,6 @@ namespace Exaltation
 					else
 						hit.DamageDealt += (int)(hit.DamageDealt * 0.03f * (PlayerData.instance.maxHealth - PlayerData.instance.health));
 				}
-				if (WearingGlorifiedCharm("DreamWielder"))
-				{
-					if (Random.Range(1, 21) == 20)
-					{
-						if (PlayerData.instance.MPCharge >= DREAM_CATCHER_COST)
-						{
-							HeroController.instance.TakeMP(DREAM_CATCHER_COST);
-							HeroController.instance.spell1Prefab.Spawn(HeroController.instance.transform.position + new Vector3(0f, 0.3f));
-							HeroController.instance.GetAttr<AudioSource>("audioSource")
-								.PlayOneShot(LoadAssets.DreamCatcherSound, 1f);
-						}
-					}
-				}
 			}
 			if (hit.AttackType == AttackTypes.SharpShadow && WearingGlorifiedCharm("SharpShadow"))
 				hit.DamageDealt *= 2;
@@ -761,9 +739,6 @@ namespace Exaltation
 				case "hiveblood":
 				case "29":
 					return Settings.HivebloodGlorified;
-				case "dreamwielder":
-				case "30":
-					return Settings.DreamWielderGlorified;
 				case "dashmaster":
 				case "31":
 					return Settings.DashmasterGlorified;
@@ -846,9 +821,6 @@ namespace Exaltation
 					return pd.bossDoorStateTier3.boundShell || pd.statueStateSly.completedTier3;
 				case "hiveblood":
 				case "29":
-					return pd.killedHollowKnightPrime;
-				case "dreamwielder":
-				case "30":
 					return pd.killedHollowKnightPrime;
 				case "dashmaster":
 				case "31":
@@ -949,10 +921,6 @@ namespace Exaltation
 				case "29":
 					Settings.HivebloodGlorified = GloryAdjust;
 					break;
-				case "dreamwielder":
-				case "30":
-					Settings.DreamWielderGlorified = GloryAdjust;
-					break;
 				case "dashmaster":
 				case "31":
 					Settings.DashmasterGlorified = GloryAdjust;
@@ -1016,8 +984,6 @@ namespace Exaltation
 					return glory && PlayerData.instance.equippedCharm_27;
 				case "hiveblood":
 					return glory && PlayerData.instance.equippedCharm_29;
-				case "dreamwielder":
-					return glory && PlayerData.instance.equippedCharm_30;
 				case "dashmaster":
 					return glory && PlayerData.instance.equippedCharm_31;
 				case "quickslash":
@@ -1116,6 +1082,7 @@ namespace Exaltation
 			{
 				if (PlayerData.instance.focusMP_amount == 24) //1.0.2.1: Swift Focus focus cost decrease removed
 					PlayerData.instance.focusMP_amount = 33;
+                Settings.DreamWielderGlorified = false; //1.0.4.4: Dream Catcher removed
 			}
 		}
 	}

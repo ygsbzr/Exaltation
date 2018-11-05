@@ -2,6 +2,10 @@
 
 Entries here are sorted in descending order depending on age; oldest entries will be the farthest down.
 
+## v1.0.4.5f
+
+* Removed the Dream Catcher.
+
 ## v1.0.4.4
 
 * Added the Dream Catcher.
